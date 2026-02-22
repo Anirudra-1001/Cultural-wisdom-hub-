@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cultural Wisdom Hub</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;700&display=swap" rel="stylesheet">
+
+<style>
+:root{
+  --bg:#fdf6f0;
+  --primary:#c97b63;
+  --accent:#f2cc8f;
+  --card:#ffffff;
+  --text:#3d405b;
+}
+body{
+  margin:0;
+  font-family:'Poppins',sans-serif;
+  background:var(--bg);
+  color:var(--text);
+}
+header{
+  text-align:center;
+  padding:30px;
+  background:var(--accent);
+}
+h1{ margin:0; }
+nav{
+  display:flex;
+  flex-wrap:wrap;
+  justify-content:center;
+  background:#fff;
+  padding:10px;
+  box-shadow:0 2px 8px rgba(0,0,0,0.08);
+}
+nav button{
+  margin:5px;
+  padding:8px 15px;
+  border:none;
+  border-radius:20px;
+  background:var(--primary);
+  color:white;
+  cursor:pointer;
+}
+.container{
+  display:flex;
+  flex-wrap:wrap;
+  justify-content:center;
+  padding:20px;
+}
+.card{
+  background:var(--card);
+  margin:15px;
+  padding:20px;
+  border-radius:15px;
+  width:260px;
+  box-shadow:0 4px 10px rgba(0,0,0,0.08);
+  transition:0.3s;
+  position:relative;
+}
+.card:hover{ transform:translateY(-5px); }
+.favorite{
+  position:absolute;
+  top:10px;
+  right:10px;
+  cursor:pointer;
+}
+input{
+  padding:10px;
+  border-radius:20px;
+  border:1px solid #ddd;
+  width:60%;
+  margin:20px auto;
+  display:block;
+}
+section{ display:none; }
+.active{ display:block; }
+.daily{
+  text-align:center;
+  padding:20px;
+  font-size:18px;
+  background:#fff;
+  margin:15px;
+  border-radius:12px;
+}
+</style>
+</head>
+
+<body>
+
+<header>
+<h1>🪔 Cultural Wisdom Hub</h1>
+<p>Ancient Knowledge • Modern Life • Timeless Values</p>
+<button onclick="setLanguage('en')">English</button>
+<button onclick="setLanguage('hi')">हिंदी</button>
+</header>
+
+<nav>
+<button onclick="showSection('home')">Home</button>
+<button onclick="showSection('festivals')">Festivals</button>
+<button onclick="showSection('gita')">Gita</button>
+<button onclick="showSection('remedies')">Remedies</button>
+<button onclick="showSection('wisdom')">Wisdom</button>
+<button onclick="showFavorites()">Favorites ❤️</button>
+</nav>
+
+<div class="daily" id="dailyWisdom"></div>
+
+<input type="text" id="search" placeholder="Search wisdom..." onkeyup="searchContent()">
+
+<section id="home" class="active">
+<div class="container" id="homeContainer"></div>
+</section>
+
+<section id="festivals">
+<div class="container" id="festivalContainer"></div>
+</section>
+
+<section id="gita">
+<div class="container" id="gitaContainer"></div>
+</section>
+
+<section id="remedies">
+<div class="container" id="remedyContainer"></div>
+</section>
+
+<section id="wisdom">
+<div class="container" id="wisdomContainer"></div>
+</section>
+
+<section id="favorites">
+<div class="container" id="favContainer"></div>
+</section>
+
+<script>
+let currentLang='en';
+let favorites=[];
+
+function setLanguage(lang){ currentLang=lang; loadAll(); }
+
+function showSection(id){
+  document.querySelectorAll("section").forEach(s=>s.classList.remove("active"));
+  document.getElementById(id).classList.add("active");
+}
+
+function showFavorites(){
+  showSection('favorites');
+  createCards(favorites,'favContainer',false);
+}
+
+const festivals=[
+{en:"Diwali: Light over darkness.",hi:"दीवाली: प्रकाश की अंधकार पर विजय।"},
+{en:"Holi: Festival of colors.",hi:"होली: रंगों का त्योहार।"},
+{en:"Navratri: Worship of Goddess.",hi:"नवरात्रि: देवी की पूजा।"}
+];
+
+const gita=[
+{en:"Do your duty without attachment.",hi:"फल की चिंता बिना कर्तव्य करें।"},
+{en:"Control the mind for peace.",hi:"मन को नियंत्रित करें।"}
+];
+
+const remedies=[
+{en:"Turmeric milk helps cough.",hi:"हल्दी दूध खांसी में लाभकारी।"},
+{en:"Ajwain improves digestion.",hi:"अजवाइन पाचन सुधारती है।"}
+];
+
+const wisdom=[];
+const themes=[
+["Respect elders.","बड़ों का सम्मान करें।"],
+["Truth always wins.","सत्य की जीत होती है।"],
+["Meditation calms mind.","ध्यान मन को शांत करता है।"],
+["Serve others selflessly.","निस्वार्थ सेवा करें।"],
+["Nature is sacred.","प्रकृति पवित्र है।"]
+];
+for(let i=0;i<120;i++){
+  themes.forEach(t=>wisdom.push({en:t[0],hi:t[1]}));
+}
+
+function createCards(data,containerId,allowFav=true){
+  const container=document.getElementById(containerId);
+  container.innerHTML="";
+  data.forEach(item=>{
+    const card=document.createElement("div");
+    card.className="card";
+    card.innerHTML=`<span class="favorite">❤️</span>${item[currentLang]}`;
+    if(allowFav){
+      card.querySelector(".favorite").onclick=()=>favorites.push(item);
+    }
+    container.appendChild(card);
+  });
+}
+
+function loadAll(){
+  createCards(festivals,'festivalContainer');
+  createCards(gita,'gitaContainer');
+  createCards(remedies,'remedyContainer');
+  createCards(wisdom,'wisdomContainer');
+  createCards(wisdom.slice(0,6),'homeContainer');
+  showDaily();
+}
+
+function showDaily(){
+  const item=wisdom[Math.floor(Math.random()*wisdom.length)];
+  document.getElementById("dailyWisdom").innerText=item[currentLang];
+}
+
+function searchContent(){
+  const term=document.getElementById("search").value.toLowerCase();
+  document.querySelectorAll(".card").forEach(card=>{
+    card.style.display=card.innerText.toLowerCase().includes(term)?"block":"none";
+  });
+}
+
+loadAll();
+</script>
+
+</body>
+</html>
